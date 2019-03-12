@@ -1,0 +1,70 @@
+APP="timetracker"
+AUTO_VERSION="build-date+time+git-revision"
+
+BUILD_HOST="timetracker.lunarlogic.io"
+BUILD_USER="timetracker"
+BUILD_AT="/tmp/edeliver/timetracker/builds"
+
+# RELEASE_STORE="${BUILD_USER}@${BUILD_HOST}:~/releases/"
+
+PRODUCTION_HOSTS="timetracker.lunarlogic.io"
+PRODUCTION_USER="timetracker"
+DELIVER_TO="/home/timetracker"
+
+pre_erlang_clean_compile() {
+ status "Installing nodejs dependencies"
+ __sync_remote "
+   [ -f ~/.profile ] && source ~/.profile
+   set -e
+   cd '$BUILD_AT'
+
+   APP='$APP' MIX_ENV='$TARGET_MIX_ENV' npm install
+ "
+
+ status "Building static assets"
+ __sync_remote "
+   [ -f ~/.profile ] && source ~/.profile
+   set -e
+   cd '$BUILD_AT/assets'
+
+   mkdir -p priv/static
+   APP='$APP' MIX_ENV='$TARGET_MIX_ENV' npm install
+   APP='$APP' MIX_ENV='$TARGET_MIX_ENV' npm run deploy
+ "
+
+ status "Compiling code"
+ __sync_remote "
+   [ -f ~/.profile ] && source ~/.profile
+   set -e
+   cd '$BUILD_AT'
+
+   APP='$APP' MIX_ENV='$TARGET_MIX_ENV' $MIX_CMD do deps.get, compile
+ "
+
+ status "Running phoenix.digest"
+ __sync_remote "
+   [ -f ~/.profile ] && source ~/.profile
+   set -e
+   cd '$BUILD_AT'
+
+   APP='$APP' MIX_ENV='$TARGET_MIX_ENV' $MIX_CMD phx.digest $SILENCE
+ "
+}
+
+post_erlang_generate_release() {
+ status "Creating releases directory"
+ __sync_remote "
+   [ -f ~/.profile ] && source ~/.profile
+   set -e
+
+   mkdir -p ~/releases/
+ "
+
+ status "Restarting the application"
+ __sync_remote "
+   [ -f ~/.profile ] && source ~/.profile
+   set -e
+
+   sudo systemctl restart $APP
+ "
+}

@@ -20,7 +20,12 @@ defmodule Timetracker.MixProject do
   def application do
     [
       mod: {Timetracker.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [
+        :logger,
+        :runtime_tools,
+        # Keep edeliver in the END of the list https://github.com/edeliver/edeliver/tree/v1.6.0#quick-start
+        :edeliver
+      ]
     ]
   end
 
@@ -42,7 +47,9 @@ defmodule Timetracker.MixProject do
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"}
+      {:plug_cowboy, "~> 2.0"},
+      {:distillery, "~> 2.0"},
+      {:edeliver, ">= 1.6.0"}
     ]
   end
 
