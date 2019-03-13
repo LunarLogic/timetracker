@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/LunarLogic/timetracker.svg?style=svg)](https://circleci.com/gh/LunarLogic/timetracker)
+
 # Timetracker
 
 To start your Phoenix server:
