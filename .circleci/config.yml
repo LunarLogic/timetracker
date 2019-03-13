@@ -1,0 +1,69 @@
+version: 2
+jobs:
+  build:
+    parallelism: 1
+    docker:
+      - image: circleci/elixir:latest-node-browsers
+        environment:
+          MIX_ENV: test
+      - image: circleci/postgres:latest
+        environment:
+          POSTGRES_DB: timetracker_test
+
+    working_directory: ~/app
+
+    steps:
+      - checkout
+
+      - run: mix local.hex --force
+      - run: mix local.rebar --force
+
+      - restore_cache:
+          keys:
+            - mix-v1-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - mix-v1-{{ .Branch }}
+            - mix-v1
+      - restore_cache:
+          keys:
+            - build-v1-{{ .Branch }}
+            - build-v1-
+      - run: mix do deps.get, compile
+      - save_cache:
+          key: mix-v1-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths: deps
+      - save_cache:
+          key: build-v1-{{ .Branch }}
+          paths: _build
+
+      - restore_cache:
+          keys:
+            - npm-v1-{{ checksum "assets/package-lock.json" }}
+            - npm-v1-
+      - run:
+          name: Installing node modules
+          command: cd assets && npm install
+      - save_cache:
+          key: npm-v1-{{ checksum "assets/package-lock.json" }}
+          paths:
+            - ~/assets/node_modules
+
+      - run:
+          name: Check formatting of Elixir code
+          command: mix format --check-formatted
+
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+      - run: mix test
+
+      - store_test_results:
+          path: _build/test/lib/timetracker
+
+      - deploy:
+          name: Deployment
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              mix edeliver build release
+              mix edeliver deploy release to production
+            fi
