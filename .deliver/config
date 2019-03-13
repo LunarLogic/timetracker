@@ -59,6 +59,11 @@ post_erlang_generate_release() {
 
    mkdir -p ~/releases/
  "
+}
+
+post_extract_release_archive() {
+ status "Running the migrations"
+ $MIX_CMD edeliver migrate $DEPLOY_ENVIRONMENT up
 
  status "Restarting the application"
  __sync_remote "
