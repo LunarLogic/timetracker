@@ -16,7 +16,8 @@ defmodule TimetrackerWeb.Router do
   scope "/", TimetrackerWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    get "/", WorkBlockController, :index
+    post "/start", WorkBlockController, :start
   end
 
   # Other scopes may use custom stacks.

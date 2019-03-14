@@ -1,0 +1,7 @@
+<ul>
+  <%= for work_block <- @work_blocks do %>
+    <li><%= work_block.started_at %> - <%= work_block.finished_at %></li>
+  <% end %>
+</ul>
+
+<%= button("start", to: "/start", method: "post") %>
