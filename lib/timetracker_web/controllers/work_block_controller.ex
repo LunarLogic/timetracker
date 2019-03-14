@@ -10,4 +10,9 @@ defmodule TimetrackerWeb.WorkBlockController do
     Timetracker.WorkBlocks.start()
     redirect(conn, to: Routes.work_block_path(conn, :index))
   end
+
+  def finish(conn, %{"id" => id}) do
+    Timetracker.WorkBlocks.finish(id)
+    redirect(conn, to: Routes.work_block_path(conn, :index))
+  end
 end

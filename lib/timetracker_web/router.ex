@@ -18,6 +18,7 @@ defmodule TimetrackerWeb.Router do
 
     get "/", WorkBlockController, :index
     post "/start", WorkBlockController, :start
+    put "/finish/:id", WorkBlockController, :finish
   end
 
   # Other scopes may use custom stacks.

@@ -12,4 +12,13 @@ defmodule Timetracker.WorkBlocks do
     started_at = DateTime.utc_now() |> DateTime.truncate(:second)
     Repo.insert!(%WorkBlock{started_at: started_at})
   end
+
+  def finish(id) do
+    finished_at = DateTime.utc_now() |> DateTime.truncate(:second)
+
+    WorkBlock
+    |> Repo.get!(id)
+    |> Ecto.Changeset.change(%{finished_at: finished_at})
+    |> Repo.update!()
+  end
 end

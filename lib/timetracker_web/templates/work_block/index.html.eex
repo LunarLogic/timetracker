@@ -1,7 +1,10 @@
 <ul>
   <%= for work_block <- @work_blocks do %>
-    <li><%= work_block.started_at %> - <%= work_block.finished_at %></li>
+    <li>
+      <%= work_block.started_at %> - <%= work_block.finished_at %>
+      <%= button("finish", to: Routes.work_block_path(@conn, :finish, work_block.id), method: "put") %>
+    </li>
   <% end %>
 </ul>
 
-<%= button("start", to: "/start", method: "post") %>
+<%= button("start", to: Routes.work_block_path(@conn, :start), method: "post") %>
